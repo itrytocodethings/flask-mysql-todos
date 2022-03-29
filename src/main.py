@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Task
 #from models import Person
 
 app = Flask(__name__)
@@ -30,6 +30,22 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+@app.route('/todos', methods=['GET', 'POST'])
+def handle_todos():
+    if request.method == "GET": 
+        all_todos = Task.query.all()
+        all_todos = list(map(lambda task: task.serialize(), all_todos))
+        response_body = jsonify(all_todos)
+        return response_body
+    if request.method == "POST":
+        req = request.json
+        task = Task(label=f"{req['label']}", done=False)
+        db.session.add(task)
+        db.session.commit()
+        all_todos = Task.query.all()
+        all_todos = list(map(lambda task: task.serialize(), all_todos))
+        return jsonify(all_todos)
+    return None
 @app.route('/user', methods=['GET'])
 def handle_hello():
 

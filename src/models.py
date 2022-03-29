@@ -2,6 +2,18 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(120), nullable=False)
+    done = db.Column(db.Boolean(), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "label": self.label,
+            "done": self.done,
+        }
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
